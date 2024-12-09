@@ -51,13 +51,16 @@ class Driver:
                     
                 # print(f"He encontrado hueco en la pista {nombre_pistas[i].text} a las {hora} con duraciones posibles de {duraciones_posibles}")
 
-                modalidad = "descubierto" if ("descubierto") in nombre_pistas[i].text.lower() else "cubierto"
+                modalidad = "descubierto" if "(descubierto)" in nombre_pistas[i].text.lower() else "cubierto"
                 if modalidad == pista_buscada.lower() and hora == hora_buscada and duracion_buscada in duraciones_posibles: 
                     dia_semana = self.obtener_dia_semana(fecha_ini.weekday())
                     print(f"La hora más cercana a tu modalidad de pista es el {dia_semana} {fecha_ini.day}/{fecha_ini.month}/{fecha_ini.year} a las {hora} en la pista {nombre_pistas[i].text}. Las duraciones posibles son de {duraciones_posibles} horas")
 
-                    # Compro pista
+                    # Reservo pista
                     btn_comprar = self.driver.find_element(by=By.CLASS_NAME, value="bbq2__duration-picker__button")
+
+                    precio_pista = self.obtener_precio(btn_comprar.text)
+                    print(f"Procedo a reservar la pista seleccionada por {precio_pista}€")
                     self.driver.execute_script("arguments[0].click();", btn_comprar)
 
                     cuadro_usuario = self.driver.find_element(by=By.ID, value="sign-up__email")
@@ -67,14 +70,13 @@ class Driver:
                     cuadro_contra.send_keys("Miguel270302")
 
                     self.driver.find_element(by=By.ID, value="sign-in__submit").click()
-                    time.sleep(10)
                     return 0
 
                 # Cierro slot
                 btn_cerrar = self.driver.find_element(by=By.CLASS_NAME, value="bbq2__duration-picker__close")
                 self.driver.execute_script("arguments[0].click();", btn_cerrar)
         
-        if fecha_ini <= fecha_fin: 
+        if fecha_ini + relativedelta(days=1) < fecha_fin: 
             self.busca_cr(fecha_ini + relativedelta(days=1), fecha_fin, hora_buscada, pista_buscada, duracion_buscada)
         return 1
 
@@ -93,6 +95,13 @@ class Driver:
         duracion = horas + minutos / 60
         
         return duracion
+
+    def obtener_precio(self, texto):
+        patron = r"(\d+,\d+)"
+        match = re.search(patron, texto)
+        precio = float(match.group(1).replace(',', '.'))
+
+        return precio
      
     def close(self):
         self.driver.quit()
