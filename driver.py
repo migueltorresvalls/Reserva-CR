@@ -56,20 +56,6 @@ class Driver:
                     dia_semana = self.obtener_dia_semana(fecha_ini.weekday())
                     print(f"La hora más cercana a tu modalidad de pista es el {dia_semana} {fecha_ini.day}/{fecha_ini.month}/{fecha_ini.year} a las {hora} en la pista {nombre_pistas[i].text}. Las duraciones posibles son de {duraciones_posibles} horas")
 
-                    # Reservo pista
-                    btn_comprar = self.driver.find_element(by=By.CLASS_NAME, value="bbq2__duration-picker__button")
-
-                    precio_pista = self.obtener_precio(btn_comprar.text)
-                    print(f"Procedo a reservar la pista seleccionada por {precio_pista}€")
-                    self.driver.execute_script("arguments[0].click();", btn_comprar)
-
-                    cuadro_usuario = self.driver.find_element(by=By.ID, value="sign-up__email")
-                    cuadro_contra = self.driver.find_element(by=By.ID, value="sign-up__password")
-
-                    cuadro_usuario.send_keys("mtorresvalls1@gmail.com")
-                    cuadro_contra.send_keys("Miguel270302")
-
-                    self.driver.find_element(by=By.ID, value="sign-in__submit").click()
                     return 0
 
                 # Cierro slot
