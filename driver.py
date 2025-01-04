@@ -23,10 +23,14 @@ class Driver:
 
     def busca_cr(self, fecha_ini, fecha_fin, hora_buscada, pista_buscada, duracion_buscada):        
         # Construyo URL
-        url = f"https://playtomic.io/ciudad-de-la-raqueta/da78dd3c-43b3-11e8-8674-52540049669c?q=TENNIS~{fecha_ini.year}-{fecha_ini.month}-{fecha_ini.day}~~~"
+        url = f"https://playtomic.io/ciudad-de-la-raqueta/da78dd3c-43b3-11e8-8674-52540049669c?q=TENNIS~{fecha_ini.year}-{fecha_ini.strftime('%m')}-{fecha_ini.strftime('%d')}"
+
+        print(f"Url: {url}")
+
         self.driver.get(url)
         self.driver.maximize_window()
 
+        # Busco pistas
         self.driver.implicitly_wait(5)
         nombre_pistas = self.driver.find_elements(by=By.XPATH, value="//div[@class='bbq2__resource__label']")
 
