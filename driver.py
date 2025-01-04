@@ -21,7 +21,7 @@ class Driver:
     def __init__(self, options=Options()):
         self.driver = webdriver.Chrome(options=options)
 
-    def busca_cr(self, fecha_ini, fecha_fin, hora_buscada, pista_buscada, duracion_buscada):        
+    def busca_cr(self, fecha_ini, fecha_fin, horas_buscadas, pista_buscada, duraciones_buscadas):        
         # Construyo URL
         url = f"https://playtomic.io/ciudad-de-la-raqueta/da78dd3c-43b3-11e8-8674-52540049669c?q=TENNIS~{fecha_ini.year}-{fecha_ini.strftime('%m')}-{fecha_ini.strftime('%d')}"
 
@@ -56,9 +56,12 @@ class Driver:
                 # print(f"He encontrado hueco en la pista {nombre_pistas[i].text} a las {hora} con duraciones posibles de {duraciones_posibles}")
 
                 modalidad = "descubierto" if "(descubierto)" in nombre_pistas[i].text.lower() else "cubierto"
-                if modalidad == pista_buscada.lower() and hora == hora_buscada and duracion_buscada in duraciones_posibles: 
+                mascara_duraciones = np.isin(np.array(duraciones_posibles), np.array(duraciones_buscadas))
+                duraciones_encontradas = np.array(duraciones_posibles)[mascara_duraciones]
+
+                if modalidad == pista_buscada.lower() and hora in horas_buscadas and len(duraciones_encontradas) > 0: 
                     dia_semana = self.obtener_dia_semana(fecha_ini.weekday())
-                    print(f"La hora más cercana a tu modalidad de pista es el {dia_semana} {fecha_ini.day}/{fecha_ini.month}/{fecha_ini.year} a las {hora} en la pista {nombre_pistas[i].text}. Las duraciones posibles son de {duraciones_posibles} horas")
+                    print(f"La hora más cercana a tu modalidad de pista es el {dia_semana} {fecha_ini.day}/{fecha_ini.month}/{fecha_ini.year} a las {hora} en la pista {nombre_pistas[i].text}. Las duraciones posibles de esa pista son de {duraciones_posibles} horas")
 
                     return 0
 
@@ -67,7 +70,7 @@ class Driver:
                 self.driver.execute_script("arguments[0].click();", btn_cerrar)
         
         if fecha_ini + relativedelta(days=1) < fecha_fin: 
-            self.busca_cr(fecha_ini + relativedelta(days=1), fecha_fin, hora_buscada, pista_buscada, duracion_buscada)
+            self.busca_cr(fecha_ini + relativedelta(days=1), fecha_fin, horas_buscadas, pista_buscada, duraciones_buscadas)
         return 1
 
     def obtener_dia_semana(self, codigo):
